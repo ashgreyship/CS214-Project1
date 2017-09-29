@@ -8,23 +8,6 @@
 //    //char** aRowfieldsArray;
 //    char* aRowString;
 //}unsortMovie;
-int storeRows(unsortMovie *unsortMovies, int *totalRow);
-
-int splitRows(unsortMovie *unsortMovies, int totalRow);
-
-int splitOneRow(unsortMovie *unsortMovies, int currRowNum);
-
-void deleteSpaces(char *oneRow);
-
-void formatQuotesFileds(char *oneRow);
-
-void deleteComma(char *subString);
-
-char **rowIntoFields(char *oneRow);
-
-void checkFirstField(char *tmpString);
-
-void removeFirst(char *str, const char *toRemove);
 
 int main(int agrc, char *argv[]) {
     if (agrc != 3) {
@@ -37,40 +20,54 @@ int main(int agrc, char *argv[]) {
     }
     char *sortField = argv[2];
 
-    unsortMovie *unsortMovies = malloc(sizeof(unsortMovie) * 100000);
+    unsortMovie **unsortMovies = malloc(sizeof(unsortMovie *) * 100000);
+    int row;
+    for (row = 0; row < 100000; row++) {
+        unsortMovies[row] = malloc(sizeof(unsortMovie) * 10000);
+    }
+
     int totalRow;
     storeRows(unsortMovies, &totalRow);
     splitRows(unsortMovies, totalRow);
-    //printf("%s\n",unsortMovies[0].aRowString);
-    int i;
-    for (i = 0; i < 28; i++) {
-        printf("%s\n", unsortMovies[5040].aRowfieldsArray[i]);
-    }
-//    printf("TotalRows:%d\n", totalRow);
-//    int i;
-//    for (i = 0; i < totalRow; i++) {
-//        printf("%s\n", unsortMovies[i].aRowString);
-//    }
-//    printf("END");
-    free(unsortMovies);
 
+    int sortFieldToInt;
+    if (checkFieldExistence(unsortMovies, sortField, &sortFieldToInt) == 1) {
+        printf("the field is not exist\n");
+        freeStructArray(unsortMovies);
+        return 1;
+    } else {
+        printf("sortFieldToInt:%d", sortFieldToInt);
+    }
+    
+    /*int i;
+    for (i = 0; i < 28; i++) {
+        printf("%s\n", unsortMovies[5043]->aRowfieldsArray[i]);
+    }*/
+    /*printf("TotalRows:%d\n", totalRow);
+    int i;
+    for (i = 0; i < totalRow; i++) {
+        printf("%s\n", unsortMovies[i].aRowString);
+    }
+    printf("END");*/
+
+    freeStructArray(unsortMovies);
     return 0;
 }
 
-int storeRows(unsortMovie *unsortMovies, int *totalRow) {
+int storeRows(unsortMovie **unsortMovies, int *totalRow) {
     *totalRow = 0;
     char *currRow = malloc(sizeof(char) * 50000);
     while (fgets(currRow, 50000, stdin)) {
         currRow[strcspn(currRow, "\n")] = 0;
-        unsortMovies[*totalRow].aRowString = malloc(sizeof(char) * 5000);
-        strcpy(unsortMovies[*totalRow].aRowString, currRow);
+        unsortMovies[*totalRow]->aRowString = malloc(sizeof(char) * 5000);
+        strcpy(unsortMovies[*totalRow]->aRowString, currRow);
         (*totalRow)++;
     }
     free(currRow);
     return 0;
 }
 
-int splitRows(unsortMovie *unsortMovies, int totalRow) {
+int splitRows(unsortMovie **unsortMovies, int totalRow) {
     int currRowNum;
     for (currRowNum = 0; currRowNum < totalRow; currRowNum++) {
         splitOneRow(unsortMovies, currRowNum);
@@ -78,13 +75,13 @@ int splitRows(unsortMovie *unsortMovies, int totalRow) {
     return 0;
 }
 
-int splitOneRow(unsortMovie *unsortMovies, int currRowNum) {
+int splitOneRow(unsortMovie **unsortMovies, int currRowNum) {
     char *oneRow = malloc(sizeof(char) * 50000);
-    strcpy(oneRow, unsortMovies[currRowNum].aRowString);
+    strcpy(oneRow, unsortMovies[currRowNum]->aRowString);
     //char* oneRow= unsortMovies[currRowNum].aRowString;
     deleteSpaces(oneRow);
     formatQuotesFileds(oneRow);
-    unsortMovies[currRowNum].aRowfieldsArray = rowIntoFields(oneRow);
+    unsortMovies[currRowNum]->aRowfieldsArray = rowIntoFields(oneRow);
 
 //    int i;
 //    for(i=0;i<28;i++) {
@@ -213,6 +210,40 @@ void removeFirst(char *str, const char *toRemove) {
     }
 }
 
+int checkFieldExistence(unsortMovie **unsortMovies, char *sortField, int *sortFieldToInt) {
+    int fieldNum;
+    *sortFieldToInt = -1;
+    int isExistence = 1;  // not exist
+    for (fieldNum = 0; fieldNum < 28; fieldNum++) {
+        char *currField = malloc(sizeof(char) * 200);
+        strcpy(currField, unsortMovies[0]->aRowfieldsArray[fieldNum]);
+        delCarriageReturn(currField);
+        if (strcmp(currField, sortField) == 0) {
+            isExistence = 0;
+            *sortFieldToInt = fieldNum + 1;
+            break;
+        }
+        free(currField);
+    }
 
+    return isExistence;
+}
+
+void delCarriageReturn(char *str) {
+    char *src, *dst;
+    for (src = dst = str; *src != '\0'; src++) {
+        *dst = *src;
+        if (*dst != '\r') dst++;
+    }
+    *dst = '\0';
+}
+
+void freeStructArray(unsortMovie **unsortMovies){
+    int row;
+    for (row = 0; row < 100000; row++) {
+        free(unsortMovies[row]);
+    }
+    free(unsortMovies);
+}
 
 

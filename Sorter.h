@@ -1,18 +1,29 @@
-/*****
-*
-*	Define structures and function prototypes for your sorter
-*
-*
-*
-******/
-
-//Suggestion: define a struct that mirrors a record (row) of the data set
-
 typedef struct movie {
-	char** aRowfieldsArray;
-    char* aRowString;
-}unsortMovie;
+    char **aRowfieldsArray;
+    char *aRowString;
+} unsortMovie;
 
 
+int storeRows(unsortMovie **unsortMovies, int *totalRow);
 
-//Suggestion: prototype a mergesort function
+int splitRows(unsortMovie **unsortMovies, int totalRow);
+
+int splitOneRow(unsortMovie **unsortMovies, int currRowNum);
+
+void deleteSpaces(char *oneRow);
+
+void formatQuotesFileds(char *oneRow);
+
+void deleteComma(char *subString);
+
+char **rowIntoFields(char *oneRow);
+
+void checkFirstField(char *tmpString);
+
+void removeFirst(char *str, const char *toRemove);
+
+int checkFieldExistence(unsortMovie **unsortMovies, char *sortField, int *sortFieldToInt);
+
+void delCarriageReturn(char *str);
+
+void freeStructArray(unsortMovie **unsortMovies);

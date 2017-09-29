@@ -4,86 +4,215 @@
 #include "Sorter.h"
 #include "mergesort.c"
 
+//typedef struct movie {
+//    //char** aRowfieldsArray;
+//    char* aRowString;
+//}unsortMovie;
+int storeRows(unsortMovie *unsortMovies, int *totalRow);
+
+int splitRows(unsortMovie *unsortMovies, int totalRow);
+
+int splitOneRow(unsortMovie *unsortMovies, int currRowNum);
+
+void deleteSpaces(char *oneRow);
+
+void formatQuotesFileds(char *oneRow);
+
+void deleteComma(char *subString);
+
+char **rowIntoFields(char *oneRow);
+
+void checkFirstField(char *tmpString);
+
+void removeFirst(char *str, const char *toRemove);
 
 int main(int agrc, char *argv[]) {
     if (agrc != 3) {
-        printf("argument are incorrect\n");
+        printf("Format of arguments is incorrect\n");
         return 1;
     }
     if (strcmp(argv[1], "-c") != 0) {
         printf("first argument is incorrect\n");
         return 1;
     }
+    char *sortField = argv[2];
 
-
-    int n = 0;
-    char **lines = (char **) malloc(sizeof(char *) * 100000);
-    char *oneLine = malloc(sizeof(char) * 50000);
-    int totalLines = 0;
-    while (fgets(oneLine, 50000, stdin)) {
-        oneLine[strcspn(oneLine, "\n")] = 0;
-        lines[totalLines] = (char *) malloc(sizeof(char) * 50000);
-        strcpy(lines[totalLines], oneLine);
-        totalLines++;
-        oneLine = realloc(oneLine, sizeof(char) * 50000);
+    unsortMovie *unsortMovies = malloc(sizeof(unsortMovie) * 100000);
+    int totalRow;
+    storeRows(unsortMovies, &totalRow);
+    splitRows(unsortMovies, totalRow);
+    //printf("%s\n",unsortMovies[0].aRowString);
+    int i;
+    for (i = 0; i < 28; i++) {
+        printf("%s\n", unsortMovies[5040].aRowfieldsArray[i]);
     }
-    free(oneLine);
-
-
-
-    unsortMovie *unsortMovies = malloc(sizeof(unsortMovie) * totalLines);
-    int currLine;
-    for (currLine = 0; currLine < totalLines; currLine++) {
-        char *curr = malloc(sizeof(char) * 50000);;
-        char **oneFilmArray = malloc(sizeof(char *) * 10000);
-
-        int type;
-        for (type = 0; type < 28; type++) {
-            oneFilmArray[type] = (char *) malloc(sizeof(char) * 100);
-        }
-
-        curr = lines[currLine];
-        char *token = strtok(curr, ",");
-        int i = 0;
-
-        while (token != NULL) {
-            oneFilmArray[i] = token;
-            token = strtok(NULL, ",");
-            i++;
-        }
-
-//        unsortMovies[currLine].color = oneFilmArray[0];
-//        unsortMovies[currLine].director_name = oneFilmArray[1];
-//        unsortMovies[currLine].num_critic_for_reviews = atoi(oneFilmArray[2]);
-//        unsortMovies[currLine].duration = atoi(oneFilmArray[3]);
-//        unsortMovies[currLine].director_facebook_likes = atoi(oneFilmArray[4]);
-//        unsortMovies[currLine].actor_3_facebook_likes = atoi(oneFilmArray[5]);
-//        unsortMovies[currLine].actor_2_name = oneFilmArray[6];
-//        unsortMovies[currLine].actor_1_facebook_likes = atoi(oneFilmArray[7]);
-//        unsortMovies[currLine].gross = atoi(oneFilmArray[8]);
-//        unsortMovies[currLine].genres = oneFilmArray[9];
-//        unsortMovies[currLine].actor_1_name = oneFilmArray[10];
-//        unsortMovies[currLine].movie_title = oneFilmArray[11];
-//        unsortMovies[currLine].num_voted_users = atoi(oneFilmArray[12]);
-//        unsortMovies[currLine].cast_total_facebook_likes = atoi(oneFilmArray[13]);
-//        unsortMovies[currLine].actor_3_name = oneFilmArray[14];
-//        unsortMovies[currLine].facenumber_in_poster = atoi(oneFilmArray[15]);
-//        unsortMovies[currLine].plot_keywords = oneFilmArray[16];
-//        unsortMovies[currLine].movie_imdb_link = oneFilmArray[17];
-//        unsortMovies[currLine].num_user_for_reviews = atoi(oneFilmArray[18]);
-//        unsortMovies[currLine].language = oneFilmArray[19];
-//        unsortMovies[currLine].country = oneFilmArray[20];
-//        unsortMovies[currLine].content_rating = oneFilmArray[21];
-//        unsortMovies[currLine].budget = atoi(oneFilmArray[22]);
-//        unsortMovies[currLine].title_year = atoi(oneFilmArray[23]);
-//        unsortMovies[currLine].actor_2_facebook_likes = atoi(oneFilmArray[24]);
-//        unsortMovies[currLine].imdb_score = atoi(oneFilmArray[25]);
-//        unsortMovies[currLine].aspect_ratio = atoi(oneFilmArray[26]);
-//        unsortMovies[currLine].movie_facebook_likes = atoi(oneFilmArray[27]);
-
-        free(curr);
-    }
-
+//    printf("TotalRows:%d\n", totalRow);
+//    int i;
+//    for (i = 0; i < totalRow; i++) {
+//        printf("%s\n", unsortMovies[i].aRowString);
+//    }
+//    printf("END");
+    free(unsortMovies);
 
     return 0;
 }
+
+int storeRows(unsortMovie *unsortMovies, int *totalRow) {
+    *totalRow = 0;
+    char *currRow = malloc(sizeof(char) * 50000);
+    while (fgets(currRow, 50000, stdin)) {
+        currRow[strcspn(currRow, "\n")] = 0;
+        unsortMovies[*totalRow].aRowString = malloc(sizeof(char) * 5000);
+        strcpy(unsortMovies[*totalRow].aRowString, currRow);
+        (*totalRow)++;
+    }
+    free(currRow);
+    return 0;
+}
+
+int splitRows(unsortMovie *unsortMovies, int totalRow) {
+    int currRowNum;
+    for (currRowNum = 0; currRowNum < totalRow; currRowNum++) {
+        splitOneRow(unsortMovies, currRowNum);
+    }
+    return 0;
+}
+
+int splitOneRow(unsortMovie *unsortMovies, int currRowNum) {
+    char *oneRow = malloc(sizeof(char) * 50000);
+    strcpy(oneRow, unsortMovies[currRowNum].aRowString);
+    //char* oneRow= unsortMovies[currRowNum].aRowString;
+    deleteSpaces(oneRow);
+    formatQuotesFileds(oneRow);
+    unsortMovies[currRowNum].aRowfieldsArray = rowIntoFields(oneRow);
+
+//    int i;
+//    for(i=0;i<28;i++) {
+//        printf("%s", unsortMovies[currRowNum].aRowfieldsArray[i]);
+//    }
+    return 0;
+}
+
+void deleteSpaces(char *oneRow) {
+    char *i = oneRow;
+    char *j = oneRow;
+    while (*j != 0) {
+        *i = *j++;
+        if (*i != ' ')
+            i++;
+    }
+    *i = 0;
+}
+
+void formatQuotesFileds(char *oneRow) {
+    char *tmpString = malloc(sizeof(char) * 50000);;
+    char *token;
+    char *beginStr = malloc(sizeof(char) * 50000);
+    char *endStr = malloc(sizeof(char) * 50000);
+    char *midStr = malloc(sizeof(char) * 50000);
+
+    strcpy(tmpString, oneRow);
+    token = strtok(tmpString, "\"");
+    strcpy(beginStr, token);
+    token = strtok(NULL, "\"");
+
+    if (token) {
+        deleteComma(token);
+        strcpy(midStr, token);
+        token = strtok(NULL, "\"");
+        strcpy(endStr, token);
+
+        tmpString[0] = '\0';
+        strcat(tmpString, beginStr);
+        strcat(tmpString, midStr);
+        strcat(tmpString, endStr);
+        strcpy(oneRow, tmpString);
+    }
+    //printf("%s",oneRow);
+    free(tmpString);
+    free(beginStr);
+    free(endStr);
+    free(midStr);
+}
+
+void deleteComma(char *subString) {
+    char *r, *w;
+    for (w = r = subString; *r; r++) {
+        if (*r != ',') {
+            *w++ = *r;
+        }
+    }
+    *w = '\0';
+}
+
+char **rowIntoFields(char *oneRow) {
+    char **oneRowFields = malloc(sizeof(char *) * 100);
+    for (int i = 0; i < 100; i++) {
+        oneRowFields[i] = malloc(sizeof(char) * 50000);
+    }
+    char *tmpString = malloc(sizeof(char) * 5000);
+    strcpy(tmpString, oneRow);
+    checkFirstField(tmpString);
+
+    char *tmp = malloc(sizeof(char) * 1000);
+    char *comma = malloc(sizeof(char) * 100);
+    strcpy(comma, ",");
+    int i = 0;
+    while (sscanf(tmpString, "%[^,],", tmp) != EOF) {
+        // printf("OUTPUT:%s\n", tmp);
+        removeFirst(tmpString, tmp);
+        removeFirst(tmpString, comma);
+        checkFirstField(tmpString);
+        strcpy(oneRowFields[i], tmp);
+        i++;
+    }
+    free(tmp);
+    free(comma);
+    free(tmpString);
+    return oneRowFields;
+}
+
+void checkFirstField(char *tmpString) {
+    char firstChar = tmpString[0];
+    if (firstChar == ',') {
+        char *newRow = malloc(sizeof(char) * 80000);
+        strcpy(newRow, "&");
+        strcat(newRow, tmpString);
+        strcpy(tmpString, newRow);
+        free(newRow);
+    }
+
+}
+
+void removeFirst(char *str, const char *toRemove) {
+    int i, j;
+    int len, removeLen;
+    int found = 0;
+
+    len = strlen(str);
+    removeLen = strlen(toRemove);
+
+    for (i = 0; i < len; i++) {
+        found = 1;
+        for (j = 0; j < removeLen; j++) {
+            if (str[i + j] != toRemove[j]) {
+                found = 0;
+                break;
+            }
+        }
+
+        /* If word has been found then remove it by shifting characters  */
+        if (found == 1) {
+            for (j = i; j <= len - removeLen; j++) {
+                str[j] = str[j + removeLen];
+            }
+
+            // Terminate from loop so only first occurrence is removed
+            break;
+        }
+    }
+}
+
+
+
+
