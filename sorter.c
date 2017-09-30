@@ -33,20 +33,19 @@ int main(int agrc, char *argv[]) {
         return 1;
     }
 
-    initializeMergeSort(unsortMovies, sortFieldToInt, totalRow);
-
-    /*int i;
-    for (i = 0; i < 28; i++) {
-        printf("%s\n", unsortMovies[178]->aRowfieldsArray[i]);
-    }*/
-    /*printf("TotalRows:%d\n", totalRow);
-    int i;
-    for (i = 0; i < totalRow; i++) {
-        printf("%s\n", unsortMovies[i].aRowString);
+    unsortMovie **preSortMovies = malloc(sizeof(struct unsortMovie *) * 100000);
+    int rowOfPreSortMovies;
+    for (rowOfPreSortMovies = 0; rowOfPreSortMovies < 100000; rowOfPreSortMovies++) {
+        preSortMovies[rowOfPreSortMovies] = malloc(sizeof(unsortMovie) * 10000);
     }
-    printf("END");*/
 
+    excludeFirstStruct(unsortMovies, preSortMovies, totalRow);
+
+    initializeMergeSort(preSortMovies, sortFieldToInt, totalRow - 1);
+    printSortedMovies(unsortMovies, preSortMovies, totalRow - 1);
     freeStructArray(unsortMovies);
+    free(preSortMovies);
+
     return 0;
 }
 
@@ -242,7 +241,22 @@ void freeStructArray(unsortMovie **unsortMovies) {
     free(unsortMovies);
 }
 
+void printSortedMovies(unsortMovie **unsortMovies, unsortMovie **preSortMovies, int totalRow) {
+    int i;
+    printf("%s", unsortMovies[0]->aRowString);
+    for (i = 0; i < totalRow; i++) {
+        printf("%s", preSortMovies[i]->aRowString);
+    }
+}
 
+void excludeFirstStruct(unsortMovie **unsortMovies, unsortMovie **preSortMovies, int totalRow) {
+    int i;
+    for (i = 1; i < totalRow; i++) {
+        preSortMovies[i - 1] = unsortMovies[i];
+    }
+
+
+}
 
 
 

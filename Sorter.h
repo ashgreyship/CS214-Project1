@@ -4,7 +4,6 @@ typedef struct movie {
 } unsortMovie;
 
 
-
 int storeRows(unsortMovie **unsortMovies, int *totalRow);
 
 int splitRows(unsortMovie **unsortMovies, int totalRow);
@@ -28,3 +27,7 @@ int checkFieldExistence(unsortMovie **unsortMovies, char *sortField, int *sortFi
 void delCarriageReturn(char *str);
 
 void freeStructArray(unsortMovie **unsortMovies);
+
+void printSortedMovies(unsortMovie **unsortMovies, unsortMovie **preSortMovies,int totalRow);
+
+void excludeFirstStruct(unsortMovie **unsortMovies, unsortMovie **preSortMovies, int totalRow);
