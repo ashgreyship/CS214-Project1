@@ -80,7 +80,7 @@ void merge(unsortMovie **preSortMovies, unsortMovie **leftUnsortMovies, int left
             }
         }
     }
-    
+
     while (leftIndex < leftCount) {
         preSortMovies[mergedIndex++] = leftUnsortMovies[leftIndex++];
     }
