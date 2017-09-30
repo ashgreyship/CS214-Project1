@@ -4,10 +4,6 @@
 #include "Sorter.h"
 #include "mergesort.c"
 
-//typedef struct movie {
-//    //char** aRowfieldsArray;
-//    char* aRowString;
-//}unsortMovie;
 
 int main(int agrc, char *argv[]) {
     if (agrc != 3) {
@@ -20,7 +16,7 @@ int main(int agrc, char *argv[]) {
     }
     char *sortField = argv[2];
 
-    unsortMovie **unsortMovies = malloc(sizeof(unsortMovie *) * 100000);
+    unsortMovie **unsortMovies = malloc(sizeof(struct unsortMovie *) * 100000);
     int row;
     for (row = 0; row < 100000; row++) {
         unsortMovies[row] = malloc(sizeof(unsortMovie) * 10000);
@@ -35,13 +31,13 @@ int main(int agrc, char *argv[]) {
         printf("the field is not exist\n");
         freeStructArray(unsortMovies);
         return 1;
-    } else {
-        printf("sortFieldToInt:%d", sortFieldToInt);
     }
-    
+
+    initializeMergeSort(unsortMovies, sortFieldToInt, totalRow);
+
     /*int i;
     for (i = 0; i < 28; i++) {
-        printf("%s\n", unsortMovies[5043]->aRowfieldsArray[i]);
+        printf("%s\n", unsortMovies[178]->aRowfieldsArray[i]);
     }*/
     /*printf("TotalRows:%d\n", totalRow);
     int i;
@@ -173,7 +169,7 @@ void checkFirstField(char *tmpString) {
     char firstChar = tmpString[0];
     if (firstChar == ',') {
         char *newRow = malloc(sizeof(char) * 80000);
-        strcpy(newRow, "&");
+        strcpy(newRow, "!");
         strcat(newRow, tmpString);
         strcpy(tmpString, newRow);
         free(newRow);
@@ -238,12 +234,15 @@ void delCarriageReturn(char *str) {
     *dst = '\0';
 }
 
-void freeStructArray(unsortMovie **unsortMovies){
+void freeStructArray(unsortMovie **unsortMovies) {
     int row;
     for (row = 0; row < 100000; row++) {
         free(unsortMovies[row]);
     }
     free(unsortMovies);
 }
+
+
+
 
 

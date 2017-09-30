@@ -1,35 +1,71 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+//#include "Sorter.h"
 
-typedef struct myStruct {
-    char *a;
-    char *b;
-} myStruct;
+void initializeMergeSort(unsortMovie **unsortMovies, int sortFieldToInt, int totalRow);
 
-int main() {
-    int maxlength = 60 + 1;
-    int arraySize = 2;
+void mergeSort(unsortMovie **unsortMovies, int leftIndex, int rightIndex, int sortFieldToInt);
 
-    myStruct *myArray = malloc(sizeof(myStruct) * arraySize);
-    int runningIndex = 0;
-    while (1) {
-        char *aline = malloc(maxlength);
-        int status = getline(&aline, &maxlength, stdin);
-        if (status == -1)
-            break;
-        char *bline = malloc(maxlength);
-        getline(&bline, &maxlength, stdin);
-        if (runningIndex == arraySize) {
-            arraySize *= 2;
-            myArray = realloc(myArray, sizeof(myStruct) * arraySize);
+void merge(unsortMovie **unsortMovies, int leftIndex, int middleIndex, int rightIndex, int sortFieldToInt);
+
+void initializeMergeSort(unsortMovie **unsortMovies, int sortFieldToInt, int totalRow) {
+    //printf("int is %d",sortFieldToInt);
+    mergeSort(unsortMovies, 0, totalRow - 1, sortFieldToInt);
+}
+
+void mergeSort(unsortMovie **unsortMovies, int leftIndex, int rightIndex, int sortFieldToInt) {
+    if (leftIndex < rightIndex) {
+        int middle = leftIndex + (rightIndex - leftIndex) / 2;
+        mergeSort(unsortMovies, leftIndex, middle, sortFieldToInt);
+        mergeSort(unsortMovies, middle + 1, rightIndex, sortFieldToInt);
+        merge(unsortMovies, leftIndex, middle, rightIndex, sortFieldToInt);
+    }
+
+
+}
+
+void merge(unsortMovie **unsortMovies, int leftIndex, int middleIndex, int rightIndex, int sortFieldToInt) {
+    int i, j, k;
+    int leftArraySize = middleIndex - leftIndex + 1;
+    int rightArraySize = rightIndex - middleIndex;
+
+    unsortMovie **leftUnsortMovie = malloc(sizeof(struct unsortMovie *) * leftArraySize);
+    unsortMovie **rightUnsortMovie = malloc(sizeof(struct unsortMovie *) * rightArraySize);
+    int leftNum, rightNum;
+    for (leftNum = 0; leftNum < leftArraySize; leftNum++) {
+        leftUnsortMovie[leftNum] = malloc(sizeof(unsortMovie) * 10000);
+    }
+    for (rightNum = 0; rightNum < rightArraySize; rightNum++) {
+        rightUnsortMovie[rightNum] = malloc(sizeof(unsortMovie) * 10000);
+    }
+
+    i = 0;
+    j = 0;
+    k = leftIndex;
+    while (i < leftArraySize && j < rightArraySize) {
+        if(strcmp(leftUnsortMovie[i]->aRowfieldsArray[sortFieldToInt-1],rightUnsortMovie[j]->aRowfieldsArray[sortFieldToInt-1])<0){
+            unsortMovies[k]=leftUnsortMovie[i];
+            i++;
+        }else{
+            unsortMovies[k]=rightUnsortMovie[j];
+            j++;
         }
-        myArray[runningIndex].a = aline;//&aline is address of local variable.
-        myArray[runningIndex].b = bline;//And content is rewritten in each loop.
-        runningIndex++;
+        k++;
     }
-    for (int i = 0; i < runningIndex; i++) {
-        printf("outside the loop at index %d, a is %s and b is %s", i, myArray[i].a, myArray[i].b);
+
+    while(i<leftArraySize){
+        unsortMovies[k]=leftUnsortMovie[i];
+        i++;
+        k++;
     }
-    //deallocate
-    return 0;
+    while(j<rightArraySize){
+        unsortMovies[k]=rightUnsortMovie[j];
+        j++;
+        k++;
+    }
+
+    free(leftUnsortMovie);
+    free(rightUnsortMovie);
+
 }
