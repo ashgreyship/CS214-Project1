@@ -139,7 +139,8 @@ void deleteComma(char *subString) {
 
 char **rowIntoFields(char *oneRow) {
     char **oneRowFields = malloc(sizeof(char *) * 100);
-    for (int i = 0; i < 100; i++) {
+    int i;
+    for (i = 0; i < 100; i++) {
         oneRowFields[i] = malloc(sizeof(char) * 50000);
     }
     char *tmpString = malloc(sizeof(char) * 5000);
@@ -149,14 +150,14 @@ char **rowIntoFields(char *oneRow) {
     char *tmp = malloc(sizeof(char) * 1000);
     char *comma = malloc(sizeof(char) * 100);
     strcpy(comma, ",");
-    int i = 0;
+    int j = 0;
     while (sscanf(tmpString, "%[^,],", tmp) != EOF) {
         // printf("OUTPUT:%s\n", tmp);
         removeFirst(tmpString, tmp);
         removeFirst(tmpString, comma);
         checkFirstField(tmpString);
-        strcpy(oneRowFields[i], tmp);
-        i++;
+        strcpy(oneRowFields[j], tmp);
+        j++;
     }
     free(tmp);
     free(comma);
